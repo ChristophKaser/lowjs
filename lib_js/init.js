@@ -4,6 +4,9 @@
 // To not run in a limitation of DukTape's Reflect.construct
 // See test/bugs/native_Reflect_construct.js for more information
 delete Reflect.construct;
+// the same happens with Reflect.get and Reflect.set when the receiver argument is specified
+delete Reflect.get;
+delete Reflect.set;
 
 exports.global = exports;
 
