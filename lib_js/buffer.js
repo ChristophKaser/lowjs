@@ -31,4 +31,94 @@ Buffer.prototype.toString = ((oldFunc) => {
     }
 })(Buffer.prototype.toString);
 
+Buffer.prototype.subarray = ((oldFunc) => {
+    // Make sure the return value of subarray is a buffer, not a Uint8Array
+    return function (offset, len) {
+        var retval = oldFunc.call(this, offset, len);
+        retval.__proto__=this.__proto__;
+        return retval;
+    }
+})(Buffer.prototype.subarray);
+
+Uint8Array.prototype.indexOf = function (needle) {        
+    for (var i = 0; i < this.length; i++) {
+        if (this[i] == needle) {
+            return i;
+        }
+    }        
+    return -1;        
+};
+
+Uint8Array.prototype.lastIndexOf = function (needle) {        
+    for (var i = this.length - 1; i >= 0 ; i--) {
+        if (this[i] == needle) {
+            return i;
+        }
+    }        
+    return -1;        
+};
+
+Uint8Array.prototype.equals = function (array) {        
+    if (this.length !== array.length) {
+        return false;
+    }
+    for (var i = 0; i < this.length; i++) {
+        if (this[i] !== array[i]) {
+            return false;
+        }
+    }        
+    return true;        
+};
+
+Uint8Array.prototype.readUIntLE = function(offset, len) {
+    offset = offset >>> 0;
+    len = len >>> 0;
+  
+    var retval = this[offset];
+    var mult = 1;
+    for (var i = 0; i < len; i++) {
+        mult <<= 2;
+        retval += this[offset + i] * mult;
+    }    
+  
+    return retval;
+};
+
+Uint8Array.prototype.readIntLE = function(offset, len) {
+    offset = offset >>> 0;
+    len = len >>> 0;
+  
+    var retval = this[offset];
+    var mult = 1;
+    for (var i = 0; i < len; i++) {
+        mult <<= 2;
+        retval += this[offset + i] * mult;
+    }    
+
+    if (retval >= mult * 0x80) {
+        retval -= Math.pow(2, 8 * byteLength);
+    }
+  
+    return retval;
+}
+
+Uint8Array.prototype.reverse = function () {            
+    var len = this.length;
+    var middle = Math.floor(len / 2);    
+    for (var index = 0; index < middle; index++) {
+      var value = this[index];
+      this[index] = this[len - index - 1];
+      this[len - index - 1] = value;
+    } return this;
+};
+
+Uint8Array.prototype.map = function (exp, thisArg) {            
+    var retval = new Uint8Array(this.length);
+    for (var i = 0; i < this.length; i++) {
+        retval[i] = exp.call(thisArg, this[i], i, this);
+    }
+    retval.__proto__=this.__proto__;
+    return retval;
+};
+
 exports.Buffer = Buffer;
