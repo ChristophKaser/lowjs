@@ -7,6 +7,8 @@ module.exports = {
     open: native.open,
     openSync: native.openSync,
 
+    fsyncSync: native.fsyncSync,
+
     closeSync: native.closeSync,
     close: native.close,
 

@@ -175,6 +175,40 @@ duk_ret_t low_fs_close_sync(duk_context *ctx)
 }
 
 // -----------------------------------------------------------------------------
+//  low_fs_fsync_sync
+// -----------------------------------------------------------------------------
+
+duk_ret_t low_fs_fsync_sync(duk_context *ctx)
+{
+    low_t *low = duk_get_low_context(ctx);
+    int fd = duk_require_int(ctx, 0);
+
+    auto iter = low->fds.find(fd);
+    if(iter == low->fds.end())
+        duk_reference_error(ctx, "file descriptor not found");
+    if(iter->second->FDType() != LOWFD_TYPE_FILE)
+        duk_reference_error(ctx, "file descriptor is not a file");
+    LowFile *file = (LowFile *)iter->second;
+
+    file->FSync(-1);
+
+    while(true)
+    {
+        low_loop_clear_callback(low, file);
+        if(file->FinishPhase()) {
+            break;
+        }
+        
+        pthread_mutex_lock(&low->loop_thread_mutex);
+        while(!file->LowLoopCallback::mNext && low->loop_callback_last != file)
+            low_loop_wait(low->duk_ctx, -1);
+        pthread_mutex_unlock(&low->loop_thread_mutex);
+    }
+
+    return 0;
+}
+
+// -----------------------------------------------------------------------------
 //  low_fs_read
 // -----------------------------------------------------------------------------
 

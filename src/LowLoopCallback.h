@@ -17,6 +17,7 @@ class LowLoopCallback
                                         LowLoopCallback *callback);
     friend duk_ret_t low_fs_open_sync(duk_context *ctx);
     friend duk_ret_t low_fs_close_sync(duk_context *ctx);
+    friend duk_ret_t low_fs_fsync_sync(duk_context *ctx);
     friend duk_ret_t low_fs_waitdone(duk_context *ctx);
 
   public:

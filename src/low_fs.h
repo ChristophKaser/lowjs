@@ -12,6 +12,7 @@ duk_ret_t low_fs_open_sync(duk_context *ctx);
 
 duk_ret_t low_fs_close(duk_context *ctx);
 duk_ret_t low_fs_close_sync(duk_context *ctx);
+duk_ret_t low_fs_fsync_sync(duk_context *ctx);
 
 duk_ret_t low_fs_read(duk_context *ctx);
 duk_ret_t low_fs_write(duk_context *ctx);

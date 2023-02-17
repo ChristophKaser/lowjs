@@ -22,6 +22,7 @@ enum
     LOWFILE_PHASE_READING,
     LOWFILE_PHASE_WRITING,
     LOWFILE_PHASE_FSTAT,
+    LOWFILE_PHASE_FSYNC,
     LOWFILE_PHASE_CLOSING
 };
 
@@ -38,6 +39,7 @@ class LowFile
     void Write(int pos, unsigned char *data, int len, int callIndex);
     void FStat(int callIndex);
     bool Close(int callIndex);
+    void FSync(int callIndex);
 
     bool FinishPhase();
 

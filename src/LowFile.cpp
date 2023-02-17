@@ -206,6 +206,41 @@ void LowFile::FStat(int callIndex)
 }
 
 // -----------------------------------------------------------------------------
+//  LowFile::FSync
+// -----------------------------------------------------------------------------
+
+void LowFile::FSync(int callIndex)
+{
+    if(mClose)
+    {
+        duk_dup(mLow->duk_ctx, callIndex);
+        low_push_error(mLow->duk_ctx, EBADF, "sync");
+        low_call_next_tick(mLow->duk_ctx, 1);
+        return;
+    }
+    if(mPhase != LOWFILE_PHASE_READY)
+    {
+        duk_dup(mLow->duk_ctx, callIndex);
+        low_push_error(mLow->duk_ctx, EALREADY, "sync");
+        low_call_next_tick(mLow->duk_ctx, 1);
+        return;
+    }
+
+    if(callIndex != -1)
+    {
+        mCallID = low_add_stash(mLow->duk_ctx, callIndex);
+        if(mCallID)
+            mLow->run_ref++;
+    }
+    else
+        mCallID = 0;
+
+    mPhase = LOWFILE_PHASE_FSYNC;
+    mDataDone = false;
+    low_data_set_callback(mLow, this, LOW_DATA_THREAD_PRIORITY_MODIFY);
+}
+
+// -----------------------------------------------------------------------------
 //  LowFile::Close
 // -----------------------------------------------------------------------------
 
@@ -325,6 +360,14 @@ bool LowFile::OnData()
         case LOWFILE_PHASE_FSTAT:
             mError = fstat(FD(), &mStat) < 0 ? errno : 0;
             mSyscall = "fstat";
+
+            mDataDone = true;
+            low_loop_set_callback(mLow, this);
+            break;
+
+        case LOWFILE_PHASE_FSYNC:
+            mError = fsync(FD()) < 0 ? errno : 0;
+            mSyscall = "fsync";
 
             mDataDone = true;
             low_loop_set_callback(mLow, this);
