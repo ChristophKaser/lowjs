@@ -21,7 +21,7 @@
 
 #include "low_native_api.h"
 #include "low_promise.h"
-#include "low_opcua.h"
+
 
 #include "duktape.h"
 #if LOW_INCLUDE_CARES_RESOLVER
@@ -650,8 +650,6 @@ static duk_ret_t low_lib_init_safe(duk_context *ctx, void *udata)
 
     low_module_init(ctx);
     low_load_module(ctx, "lib:init", false);
-
-    low_register_opcua(low);
 
     return 0;
 }

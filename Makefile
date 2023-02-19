@@ -45,8 +45,7 @@ OBJECTS =							\
 	src/LowDNSResolver.o			\
 	src/LowTLSContext.o				\
 	src/low_native_api.o			\
-	src/low_promise.o				\
-	src/low_opcua.o
+	src/low_promise.o
 
 all: bin/low lib/BUILT
 
@@ -54,7 +53,6 @@ clean:
 	rm -rf */*.o */*.d bin/* deps/duktape/src-low lib lib_js/build node_modules util/dukc test/duk_crash
 	cd deps/c-ares && make clean
 	cd deps/mbedtls && make clean
-	cd deps/open62541 && rm -rf build
 	rm deps/c-ares/configure
 
 bin/low: $(OBJECTS) $(OBJECTS_LOW) deps/mbedtls/programs/test/benchmark
@@ -76,7 +74,7 @@ deps/duktape/src-low/duktape.o: deps/duktape/src-low/duktape.c Makefile
 	$(CXX) $(CXXFLAGS) -MMD -o $@ -c $<
 %.o : %.c Makefile
 	$(C) $(CFLAGS) -MMD -o $@ -c $<
-%.o : %.cpp Makefile deps/c-ares/.libs/libcares.a deps/open62541/build/bin/libopen62541.a
+%.o : %.cpp Makefile deps/c-ares/.libs/libcares.a
 	$(CXX) $(CXXFLAGS) -MMD -o $@ -c $<
 
 -include $(OBJECTS:.o=.d) $(OBJECTS_LOW:.o=.d)
@@ -126,11 +124,6 @@ deps/c-ares/.libs/libcares.a: deps/c-ares/Makefile
 
 deps/mbedtls/programs/test/benchmark:
 	cd deps/mbedtls && make
-
-deps/open62541/build/bin/libopen62541.a:
-	cd deps/open62541 && rm -rf build && mkdir build
-	cd deps/open62541/build && cmake ..
-	cd deps/open62541/build && make
 
 # Builds distribution
 dist: all
