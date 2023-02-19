@@ -1,13 +1,16 @@
+TOOLCHAIN_PREFIX=$(shell pwd)/../rsdk-4.4.7-4181-EB-2.6.30-0.9.30-m32u-140129/bin/mips-linux-
 FLAGS = -O3 -DLOW_VERSION="\"`git show -s --format=%cd --date=format:%Y%m%d`_`git rev-parse --short HEAD`\""
 
-C = gcc
+C = $(TOOLCHAIN_PREFIX)gcc
 CFLAGS = $(FLAGS) -Isrc -Iapp -Ideps/duktape/src-low -Ideps/mbedtls/include -Ideps/mbedtls/crypto/include
 
-CXX = g++
-CXXFLAGS = $(CXXFLAGS_SERV) $(FLAGS) -Isrc -Iapp -Ideps/duktape/src-low -Ideps/mbedtls/include -Ideps/mbedtls/crypto/include -Ideps/open62541/build/src_generated -Ideps/open62541/include -Ideps/open62541/arch -Ideps/open62541/plugins/include -Ideps/open62541/src/client -Ideps/open62541/deps -Ideps/open62541/src --std=c++11
+CXX = $(TOOLCHAIN_PREFIX)g++
+CXXFLAGS = $(CXXFLAGS_SERV) $(FLAGS) -Isrc -Iapp -Ideps/duktape/src-low -Ideps/mbedtls/include -Ideps/mbedtls/crypto/include -Dnullptr=0
 
-LD = g++
-LDFLAGS = $(FLAGS) -lm -ldl -lpthread deps/open62541/build/bin/libopen62541.a -lresolv
+LD = $(TOOLCHAIN_PREFIX)g++
+LDFLAGS = $(FLAGS) -lm -ldl -lpthread -lresolv
+
+
 
 OBJECTS_LOW =						\
 	app/main.o						\
@@ -117,13 +120,13 @@ deps/duktape/src-low/duktape.c: $(shell find deps/duktape/src-input)
 
 deps/c-ares/configure:
 	cd deps/c-ares && . ./buildconf
-deps/c-ares/Makefile: deps/c-ares/configure
-	cd deps/c-ares && ./configure
+deps/c-ares/Makefile: deps/c-ares/configure 
+	cd deps/c-ares && CC="$(C)" ./configure --target=mips-linux --host=amd64-linux
 deps/c-ares/.libs/libcares.a: deps/c-ares/Makefile
 	cd deps/c-ares && make
 
 deps/mbedtls/programs/test/benchmark:
-	cd deps/mbedtls && make
+	cd deps/mbedtls && CC="$(C) -std=c99" make
 
 # Builds distribution
 dist: all
