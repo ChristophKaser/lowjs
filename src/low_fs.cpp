@@ -118,7 +118,7 @@ duk_ret_t low_fs_close(duk_context *ctx)
     low_t *low = duk_get_low_context(ctx);
     int fd = duk_require_int(ctx, 0);
 
-    auto iter = low->fds.find(fd);
+    std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.find(fd);
     if(iter == low->fds.end())
         duk_reference_error(ctx, "file descriptor not found");
     LowFD *file = iter->second;
@@ -143,7 +143,7 @@ duk_ret_t low_fs_close_sync(duk_context *ctx)
     low_t *low = duk_get_low_context(ctx);
     int fd = duk_require_int(ctx, 0);
 
-    auto iter = low->fds.find(fd);
+    std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.find(fd);
     if(iter == low->fds.end())
         duk_reference_error(ctx, "file descriptor not found");
     if(iter->second->FDType() != LOWFD_TYPE_FILE)
@@ -183,7 +183,7 @@ duk_ret_t low_fs_fsync_sync(duk_context *ctx)
     low_t *low = duk_get_low_context(ctx);
     int fd = duk_require_int(ctx, 0);
 
-    auto iter = low->fds.find(fd);
+    std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.find(fd);
     if(iter == low->fds.end())
         duk_reference_error(ctx, "file descriptor not found");
     if(iter->second->FDType() != LOWFD_TYPE_FILE)
@@ -227,7 +227,7 @@ duk_ret_t low_fs_read(duk_context *ctx)
     if(offset < 0 || length < 0 || offset + length > buf_len)
         duk_range_error(ctx, "offset/length outside of buffer");
 
-    auto iter = low->fds.find(fd);
+    std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.find(fd);
     if(iter == low->fds.end())
         duk_reference_error(ctx, "file descriptor not found");
     LowFD *file = iter->second;
@@ -255,7 +255,7 @@ duk_ret_t low_fs_write(duk_context *ctx)
     if(offset < 0 || length < 0 || offset + length > buf_len)
         duk_range_error(ctx, "offset/length outside of buffer");
 
-    auto iter = low->fds.find(fd);
+    std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.find(fd);
     if(iter == low->fds.end())
         duk_reference_error(ctx, "file descriptor not found");
     LowFD *file = iter->second;
@@ -273,7 +273,7 @@ duk_ret_t low_fs_fstat(duk_context *ctx)
     low_t *low = duk_get_low_context(ctx);
     int fd = duk_require_int(ctx, 0);
 
-    auto iter = low->fds.find(fd);
+    std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.find(fd);
     if(iter == low->fds.end())
         duk_reference_error(ctx, "file descriptor not found");
     if(iter->second->FDType() != LOWFD_TYPE_FILE)
@@ -293,7 +293,7 @@ duk_ret_t low_fs_waitdone(duk_context *ctx)
     low_t *low = duk_get_low_context(ctx);
     int fd = duk_require_int(ctx, 0);
 
-    auto iter = low->fds.find(fd);
+    std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.find(fd);
     if(iter == low->fds.end())
         return 0;
 
@@ -325,7 +325,7 @@ duk_ret_t low_fs_file_pos(duk_context *ctx)
     low_t *low = duk_get_low_context(ctx);
     int fd = duk_require_int(ctx, 0);
 
-    auto iter = low->fds.find(fd);
+    std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.find(fd);
     if(iter == low->fds.end())
         duk_reference_error(ctx, "file descriptor not found");
     if(iter->second->FDType() != LOWFD_TYPE_FILE)

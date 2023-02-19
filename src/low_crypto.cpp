@@ -94,7 +94,7 @@ duk_ret_t low_crypto_hash_update(duk_context *ctx)
         duk_reference_error(ctx, "crypto hash not found");
 
     duk_size_t len;
-    auto buffer = duk_require_buffer_data(ctx, 1, &len);
+    void* buffer = duk_require_buffer_data(ctx, 1, &len);
 
     low->cryptoHashes[index]->Update((unsigned char *)buffer, len);
     return 0;
@@ -114,7 +114,7 @@ duk_ret_t low_crypto_hash_digest(duk_context *ctx)
         duk_reference_error(ctx, "crypto hash not found");
 
     int len = low->cryptoHashes[index]->OutputSize();
-    auto buffer = low_push_buffer(ctx, len);
+    void* buffer = low_push_buffer(ctx, len);
 
     low->cryptoHashes[index]->Digest((unsigned char *)buffer, len);
     return 1;

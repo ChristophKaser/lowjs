@@ -22,7 +22,7 @@ duk_ret_t low_http_get_request(duk_context *ctx)
     low_t *low = duk_get_low_context(ctx);
 
     int socketFD = duk_require_int(ctx, 0);
-    auto iter = low->fds.find(socketFD);
+    std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.find(socketFD);
     if(iter == low->fds.end())
         return 0;
 
@@ -68,7 +68,7 @@ duk_ret_t low_http_detach(duk_context *ctx)
     low_t *low = duk_get_low_context(ctx);
 
     int socketFD = duk_require_int(ctx, 0);
-    auto iter = low->fds.find(socketFD);
+    std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.find(socketFD);
     if(iter == low->fds.end())
         return 0;
 
@@ -100,7 +100,7 @@ duk_ret_t low_http_read(duk_context *ctx)
     unsigned char *buf =
       (unsigned char *)duk_require_buffer_data(ctx, 1, &buf_len);
 
-    auto iter = low->fds.find(socketFD);
+    std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.find(socketFD);
     if(iter == low->fds.end())
         return 0;
 
@@ -136,7 +136,7 @@ duk_ret_t low_http_write(duk_context *ctx)
         ? NULL
         : (unsigned char *)duk_require_buffer_data(ctx, 1, &buf_len);
 
-    auto iter = low->fds.find(socketFD);
+    std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.find(socketFD);
     if(iter == low->fds.end())
         return 0;
 
@@ -170,7 +170,7 @@ duk_ret_t low_http_write_head(duk_context *ctx)
     int len = duk_require_int(ctx, 2);
     bool isChunked = duk_require_boolean(ctx, 3);
 
-    auto iter = low->fds.find(socketFD);
+    std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.find(socketFD);
     if(iter == low->fds.end())
         return 0;
 

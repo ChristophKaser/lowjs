@@ -115,7 +115,7 @@ duk_ret_t low_dgram_send(duk_context *ctx)
     int port = duk_require_int(ctx, 3);
     // 4 = callback
 
-    auto iter = low->fds.find(fd);
+    std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.find(fd);
     if(iter == low->fds.end())
         duk_reference_error(ctx, "file descriptor not found");
     if(iter->second->FDType() != LOWFD_TYPE_DATAGRAM)

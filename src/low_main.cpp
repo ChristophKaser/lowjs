@@ -650,7 +650,7 @@ static duk_ret_t low_lib_init_safe(duk_context *ctx, void *udata)
 
     low_module_init(ctx);
     low_load_module(ctx, "lib:init", false);
-
+    
     return 0;
 }
 
@@ -809,9 +809,9 @@ void low_destroy(low_t *low)
             delete low->data_callback_first[0];
         while(low->data_callback_first[1])
             delete low->data_callback_first[1];
-        for(auto iter = low->fds.begin(); iter != low->fds.end();)
+        for(std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.begin(); iter != low->fds.end();)
         {
-            auto iter2 = iter;
+            std::map<int, LowFD *, std::less<int> >::iterator iter2 = iter;
             iter++;
             delete iter2->second;
         }

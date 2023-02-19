@@ -75,7 +75,7 @@ struct low_t
     bool web_thread_done;
     bool reset_accepts;
 
-    map<int, LowFD *, less<int>> fds;
+    map<int, LowFD *, less<int> > fds;
 
 #if LOW_INCLUDE_CARES_RESOLVER
     vector<LowDNSResolver *> resolvers;

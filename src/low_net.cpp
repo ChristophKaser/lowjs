@@ -288,7 +288,7 @@ duk_ret_t low_net_setsockopt(duk_context *ctx)
         return 0;
 
     int fd = duk_require_int(ctx, 0);
-    auto iter = low->fds.find(fd);
+    std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.find(fd);
     if(iter == low->fds.end())
         return 0;
 
@@ -313,7 +313,7 @@ duk_ret_t low_net_shutdown(duk_context *ctx)
     low_t *low = duk_get_low_context(ctx);
     int fd = duk_require_int(ctx, 0);
 
-    auto iter = low->fds.find(fd);
+    std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.find(fd);
     if(iter == low->fds.end())
         return 0;
 
@@ -334,7 +334,7 @@ duk_ret_t low_net_connections(duk_context *ctx)
     low_t *low = duk_get_low_context(ctx);
     int fd = duk_require_int(ctx, 0);
 
-    auto iter = low->fds.find(fd);
+    std::map<int, LowFD *, std::less<int> >::iterator iter = low->fds.find(fd);
     if(iter == low->fds.end())
         return 0;
 

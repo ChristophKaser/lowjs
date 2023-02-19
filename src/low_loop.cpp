@@ -114,7 +114,7 @@ duk_ret_t low_loop_run_safe(duk_context *ctx, void *udata)
         {
             int tick_count = low_tick_count();
 
-            auto iter = low->chore_times.lower_bound(low->last_chore_time);
+            std::multimap<int, int>::iterator iter = low->chore_times.lower_bound(low->last_chore_time);
             if(iter == low->chore_times.end())
                 iter = low->chore_times.begin();
 
@@ -126,7 +126,7 @@ duk_ret_t low_loop_run_safe(duk_context *ctx, void *udata)
                 int index = iter->second;
                 low->chore_times.erase(iter);
 
-                auto iterData = low->chores.find(index);
+                std::map<int, low_chore_t>::iterator iterData = low->chores.find(index);
                 if(iterData->second.oneshot == 2)
                 {
                     // C version
@@ -287,11 +287,11 @@ duk_ret_t low_loop_clear_chore(duk_context *ctx)
     low_t *low = duk_get_low_context(ctx);
     int index = duk_require_int(ctx, 0);
 
-    auto iter = low->chores.find(index);
+    std::map<int, low_chore_t>::iterator iter = low->chores.find(index);
     if(iter == low->chores.end())
         return 0;
 
-    auto iter2 = low->chore_times.find(iter->second.stamp);
+    std::multimap<int, int>::iterator iter2 = low->chore_times.find(iter->second.stamp);
     while(iter2->second != index)
         iter2++;
     low->chore_times.erase(iter2);
@@ -321,10 +321,10 @@ int low_set_timeout(duk_context *ctx, int index, int delay, void (*call)(duk_con
     }
     else
     {
-        auto iter = low->chores.find(index);
+        std::map<int, low_chore_t>::iterator iter = low->chores.find(index);
         if(iter != low->chores.end())
         {
-            auto iter2 = low->chore_times.find(iter->second.stamp);
+            std::multimap<int, int>::iterator iter2 = low->chore_times.find(iter->second.stamp);
             while(iter2->second != index)
                 iter2++;
             low->chore_times.erase(iter2);
@@ -358,11 +358,11 @@ void low_clear_timeout(duk_context *ctx, int index)
 {
     low_t *low = duk_get_low_context(ctx);
 
-    auto iter = low->chores.find(index);
+    std::map<int, low_chore_t>::iterator iter = low->chores.find(index);
     if(iter == low->chores.end())
         return;
 
-    auto iter2 = low->chore_times.find(iter->second.stamp);
+    std::multimap<int, int>::iterator iter2 = low->chore_times.find(iter->second.stamp);
     while(iter2->second != index)
         iter2++;
     low->chore_times.erase(iter2);
@@ -383,7 +383,7 @@ duk_ret_t low_loop_chore_ref(duk_context *ctx)
     int index = duk_require_int(ctx, 0);
     bool ref = duk_require_boolean(ctx, 1);
 
-    auto iter = low->chores.find(index);
+    std::map<int, low_chore_t>::iterator iter = low->chores.find(index);
     if(iter == low->chores.end())
         return 0;
 

@@ -142,7 +142,7 @@ void *low_web_thread_main(void *arg)
                         fds[i].fd = -1;
 
                         // Remove from web thread list
-                        auto fd = lowFDs[i];
+                        LowFD * fd = lowFDs[i];
                         pthread_mutex_lock(&low->web_thread_mutex);
                         if(fd->mNextChanged || low->web_changed_last == fd)
                         {
@@ -150,7 +150,7 @@ void *low_web_thread_main(void *arg)
                                 low->web_changed_first = fd->mNextChanged;
                             else
                             {
-                                auto elem = low->web_changed_first;
+                                LowFD * elem = low->web_changed_first;
                                 while(elem)
                                 {
                                     if(elem->mNextChanged == fd)
@@ -249,7 +249,7 @@ void *low_web_thread_main(void *arg)
                     {
                         fd->mPollIndex = fds.size();
 
-                        fds.emplace_back(pollfd());
+                        fds.push_back(pollfd());
                         lowFDs.push_back(fd);
                     }
                 }

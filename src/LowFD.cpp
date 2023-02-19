@@ -19,7 +19,7 @@ LowFD::~LowFD()
     if(mLow->reset_accepts && mAdvertisedFD >= 0 /* make sure we are in code thread */)
     {
         mLow->reset_accepts = false;
-        for(auto iter = mLow->fds.begin(); iter != mLow->fds.end(); iter++)
+        for(std::map<int, LowFD *, std::less<int> >::iterator iter = mLow->fds.begin(); iter != mLow->fds.end(); iter++)
         {
             if(iter->second->FDType() == LOWFD_TYPE_SERVER && iter->second->FD() >= 0
             && !((LowServerSocket *)iter->second)->WaitForNotTooManyConnections())
