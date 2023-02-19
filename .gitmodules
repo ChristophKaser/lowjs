@@ -7,9 +7,6 @@
 [submodule "deps/c-ares"]
 	path = deps/c-ares
 	url = https://github.com/c-ares/c-ares.git
-[submodule "deps/open62541"]
-	path = deps/open62541
-	url = https://github.com/neonious/open62541
 [submodule "examples/native/low_native_api"]
 	path = examples/native/low_native_api
 	url = https://www.github.com/neonious/low_native_api
