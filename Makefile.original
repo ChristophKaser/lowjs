@@ -1,16 +1,13 @@
-TOOLCHAIN_PREFIX=$(shell pwd)/../rsdk-4.4.7-4181-EB-2.6.30-0.9.30-m32u-140129/bin/mips-linux-
-FLAGS = -O3 -DLOW_VERSION="\"`git show -s --format=%cd --date=format:%Y%m%d`_`git rev-parse --short HEAD`\""
+FLAGS = -g -DLOW_VERSION="\"`git show -s --format=%cd --date=format:%Y%m%d`_`git rev-parse --short HEAD`\""
 
-C = $(TOOLCHAIN_PREFIX)gcc
+C = gcc
 CFLAGS = $(FLAGS) -Isrc -Iapp -Ideps/duktape/src-low -Ideps/mbedtls/include -Ideps/mbedtls/crypto/include
 
-CXX = $(TOOLCHAIN_PREFIX)g++
-CXXFLAGS = $(CXXFLAGS_SERV) $(FLAGS) -Isrc -Iapp -Ideps/duktape/src-low -Ideps/mbedtls/include -Ideps/mbedtls/crypto/include -Dnullptr=0
+CXX = g++
+CXXFLAGS = $(CXXFLAGS_SERV) $(FLAGS) -Isrc -Iapp -Ideps/duktape/src-low -Ideps/mbedtls/include -Ideps/mbedtls/crypto/include --std=c++11
 
-LD = $(TOOLCHAIN_PREFIX)g++
+LD = g++
 LDFLAGS = $(FLAGS) -lm -ldl -lpthread -lresolv
-
-
 
 OBJECTS_LOW =						\
 	app/main.o						\
@@ -50,22 +47,25 @@ OBJECTS =							\
 	src/low_native_api.o			\
 	src/low_promise.o
 
-all: bin/low lib/BUILT
+all: bin/low_host lib/BUILT
 
 clean:
-	rm -rf */*.o */*.d bin/* deps/duktape/src-low lib lib_js/build node_modules util/dukc test/duk_crash
+	rm -rf */*.o */*.d bin/* deps/duktape/src-low lib lib_js/build node_modules util/dukc_host test/duk_crash
 	cd deps/c-ares && make clean
 	cd deps/mbedtls && make clean
 	rm deps/c-ares/configure
 
-bin/low: $(OBJECTS) $(OBJECTS_LOW) deps/mbedtls/programs/test/benchmark
+clean_duk:
+	rm -rf */*.o */*.d bin/* deps/duktape/src-low util/dukc_host test/duk_crash	
+
+bin/low_host: $(OBJECTS) $(OBJECTS_LOW) deps/mbedtls/programs/test/benchmark
 	mkdir -p bin
-	 $(LD) -o bin/low deps/mbedtls/library/*.o deps/c-ares/libcares_la-*.o $(OBJECTS) $(OBJECTS_LOW) $(LDFLAGS)
+	 $(LD) -o bin/low_host deps/mbedtls/library/*.o deps/c-ares/libcares_la-*.o $(OBJECTS) $(OBJECTS_LOW) $(LDFLAGS)
 
-obj_lowjs_serv: $(OBJECTS) $(OBJECTS_LOW) deps/mbedtls/programs/test/benchmark util/dukc
+obj_lowjs_serv: $(OBJECTS) $(OBJECTS_LOW) deps/mbedtls/programs/test/benchmark util/dukc_host
 
-util/dukc: deps/duktape/src-low/duktape.o util/dukc.o
-	 $(LD) -o util/dukc deps/duktape/src-low/duktape.o util/dukc.o $(LDFLAGS)
+util/dukc_host: deps/duktape/src-low/duktape.o util/dukc.o
+	 $(LD) -o util/dukc_host deps/duktape/src-low/duktape.o util/dukc.o $(LDFLAGS)
 
 test/bugs/duk_crash_TR20180627: deps/duktape/src-low/duktape.o test/bugs/duk_crash_TR20180627.o
 	 $(LD) -o test/bugs/duk_crash_TR20180627 deps/duktape/src-low/duktape.o test/bugs/duk_crash_TR20180627.o $(LDFLAGS)
@@ -82,7 +82,7 @@ deps/duktape/src-low/duktape.o: deps/duktape/src-low/duktape.c Makefile
 
 -include $(OBJECTS:.o=.d) $(OBJECTS_LOW:.o=.d)
 
-lib/BUILT: util/dukc node_modules/BUILT $(shell find lib_js) util/root-certs.json
+lib/BUILT: util/dukc_host node_modules/BUILT $(shell find lib_js) util/root-certs.json
 	rm -rf lib lib_js/build
 	cd lib_js && node ../node_modules/typescript/bin/tsc
 	cp node_modules/\@babel/standalone/babel.min.js lib_js/build/babel.js
@@ -117,16 +117,20 @@ deps/duktape/src-low/duktape.c: $(shell find deps/duktape/src-input)
 		-DDUK_USE_SYMBOL_BUILTIN	\
 		-DDUK_USE_SECTION_B \
 		-DDUK_USE_CPP_EXCEPTIONS
+#		-DDUK_USE_DEBUG \
+#		-DDUK_USE_DEBUG_LEVEL=0 \
+#		'-DDUK_USE_DEBUG_WRITE(level,file,line,func,msg)=do {fprintf(stderr, "D%ld %s:%ld (%s): %s\n", (long) (level), (file), (long) (line), (func), (msg));} while(0)'
+
 
 deps/c-ares/configure:
 	cd deps/c-ares && . ./buildconf
-deps/c-ares/Makefile: deps/c-ares/configure 
-	cd deps/c-ares && CC="$(C)" ./configure --target=mips-linux --host=amd64-linux
+deps/c-ares/Makefile: deps/c-ares/configure
+	cd deps/c-ares && ./configure
 deps/c-ares/.libs/libcares.a: deps/c-ares/Makefile
 	cd deps/c-ares && make
 
 deps/mbedtls/programs/test/benchmark:
-	cd deps/mbedtls && CC="$(C) -std=c99" make
+	cd deps/mbedtls && make
 
 # Builds distribution
 dist: all
