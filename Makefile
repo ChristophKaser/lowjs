@@ -58,11 +58,11 @@ clean:
 	cd deps/mbedtls && make clean
 	rm deps/c-ares/configure
 
-bin/low: $(OBJECTS) $(OBJECTS_LOW) deps/mbedtls/programs/test/benchmark
+bin/low: $(OBJECTS) $(OBJECTS_LOW) deps/mbedtls/library/libmbedtls.a
 	mkdir -p bin
 	 $(LD) -o bin/low deps/mbedtls/library/*.o deps/c-ares/libcares_la-*.o $(OBJECTS) $(OBJECTS_LOW) $(LDFLAGS)
 
-obj_lowjs_serv: $(OBJECTS) $(OBJECTS_LOW) deps/mbedtls/programs/test/benchmark util/dukc
+obj_lowjs_serv: $(OBJECTS) $(OBJECTS_LOW) deps/mbedtls/library/libmbedtls.a util/dukc
 
 util/dukc: deps/duktape/src-low/duktape.o util/dukc.o
 	 $(LD) -o util/dukc deps/duktape/src-low/duktape.o util/dukc.o $(LDFLAGS)
@@ -125,8 +125,12 @@ deps/c-ares/Makefile: deps/c-ares/configure
 deps/c-ares/.libs/libcares.a: deps/c-ares/Makefile
 	cd deps/c-ares && make
 
-deps/mbedtls/programs/test/benchmark:
-	cd deps/mbedtls && CC="$(C) -std=c99" make
+deps/mbedtls/library/libmbedtls.a: deps/mbedtls/patch_applied
+	cd deps/mbedtls && CC="$(C) -std=c99" make lib
+
+deps/mbedtls/patch_applied:
+	cd deps/mbedtls && patch --input=../mbedtls_no_time.patch -p 1
+	touch deps/mbedtls/patch_applied
 
 # Builds distribution
 dist: all
