@@ -64,7 +64,7 @@ function connect(...args) {
 // but will not be handled here (handled in listen())
 let normalizedArgsSymbol = Symbol();
 function isPipeName(s) {
-    return typeof s === 'string' && toNumber(s) === false;
+    return typeof s === 'string' && isNaN(s);
 }
 function normalizeArgs(args) {
     let arr;
