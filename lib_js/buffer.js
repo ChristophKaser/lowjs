@@ -122,3 +122,4 @@ Uint8Array.prototype.map = function (exp, thisArg) {
 };
 
 exports.Buffer = Buffer;
+exports.SlowBuffer = Buffer;
