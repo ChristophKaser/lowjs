@@ -5,6 +5,9 @@ let native = require('native');
 // TODO: make Hash a transform stream
 class Hash {
     constructor(type, key) {
+        if (key instanceof KeyObject) {
+            key = key.key;
+        }
         this._native = native.createCryptoHash(this, type, key);
     }
 
@@ -26,6 +29,20 @@ class Hash {
 }
 
 exports.randomBytes = native.randomBytes;
+
+
+class KeyObject {
+    constructor(key, encoding, type) {
+        this.key = key;
+        this.encoding = encoding;
+        this.type = type;
+    }
+}
+
+exports.KeyObject = KeyObject;
+exports.createSecretKey = function(key, encoding) {
+    return new KeyObject(key, encoding, 'secret');
+}
 
 exports.createHash = function (type) {
     return new Hash(type);
