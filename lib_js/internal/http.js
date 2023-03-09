@@ -701,6 +701,13 @@ class ClientRequest extends stream.Writable {
 
                 this.emit('error', err);
             });
+
+            socket.once('timeout', () => {
+                if(socket._httpSetup != this)
+                    return;
+
+                this.emit('timeout');
+            });
         }
 
         if (socket.connecting) {
@@ -829,6 +836,13 @@ class ClientRequest extends stream.Writable {
             this._httpMessage.destroy();
         else
             this.destroy();
+    }
+
+    setTimeout(timeout, cb) {
+        this.timeout = timeout;
+        if (cb) {
+            this.once('timeout', cb);
+        }
     }
 }
 
