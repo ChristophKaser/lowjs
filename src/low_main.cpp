@@ -9,6 +9,7 @@
 #include "low_web_thread.h"
 
 #include "LowCryptoHash.h"
+#include "LowCryptoKeyObject.h"
 #include "LowDataCallback.h"
 #include "LowFD.h"
 #include "LowLoopCallback.h"
@@ -594,6 +595,9 @@ bool low_reset(low_t *low)
     for(int i = 0; i < low->cryptoHashes.size(); i++)
         if(low->cryptoHashes[i])
             delete low->cryptoHashes[i];
+    for(int i = 0; i < low->cryptoKeyObjects.size(); i++)
+        if(low->cryptoKeyObjects[i])
+            delete low->cryptoKeyObjects[i];
 
     low->duk_ctx = new_ctx;
 
@@ -860,6 +864,10 @@ void low_destroy(low_t *low)
     for(int i = 0; i < low->cryptoHashes.size(); i++)
         if(low->cryptoHashes[i])
             delete low->cryptoHashes[i]; // TODO: also needed in restart?
+
+    for(int i = 0; i < low->cryptoKeyObjects.size(); i++)
+        if(low->cryptoKeyObjects[i])
+            delete low->cryptoKeyObjects[i];
 
     pthread_mutex_destroy(&low->ref_mutex);
     low_free(low);

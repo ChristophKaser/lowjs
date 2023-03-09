@@ -1,10 +1,12 @@
 'use script';
 
 let native = require('native');
+let Writable = require('stream').Writable;
 
 // TODO: make Hash a transform stream
-class Hash {
-    constructor(type, key) {
+class Hash extends Writable {
+    constructor(type, key, options) {
+        super(options);
         if (key instanceof KeyObject) {
             key = key.key;
         }
@@ -26,6 +28,12 @@ class Hash {
         else
             return val;
     }
+
+    _write(data, encoding, done) {
+        this.update(data, encoding);
+        if (done)
+            done();
+    }
 }
 
 exports.randomBytes = native.randomBytes;
@@ -36,12 +44,21 @@ class KeyObject {
         this.key = key;
         this.encoding = encoding;
         this.type = type;
+        this._native = native.createCryptoKeyObject(this, type == 'secret' ? 2 : type == 'private' ? 1 : 3, key);
     }
 }
 
 exports.KeyObject = KeyObject;
 exports.createSecretKey = function(key, encoding) {
     return new KeyObject(key, encoding, 'secret');
+}
+
+exports.createPrivateKey = function(key, encoding) {
+    return new KeyObject(key, encoding, 'private');
+}
+
+exports.createPublicKey = function(key, encoding) {
+    return new KeyObject(key, encoding, 'public');
 }
 
 exports.createHash = function (type) {
@@ -85,4 +102,30 @@ exports.randomFill = function(buffer, offset, size, callback) {
     process.nextTick(() => {
         callback(null, buffer);
     });
+}
+
+class Sign extends Hash {
+    constructor(algorithm, options) {
+        super(algorithm, undefined, options);
+        this.algorithm = algorithm;
+    }
+
+    sign(key, encoding) {
+        if (!(key instanceof KeyObject)) {
+            key = exports.createPrivateKey(key);
+        }
+        let hash = this.digest();
+        let signature = native.cryptoSign(key._native, hash, this.algorithm);
+        if (encoding)
+            return signature.toString(encoding);
+        else
+            return signature;
+    }
+}
+
+exports.createSign = function(algorithm, options) {
+    if (algorithm.startsWith('RSA-')) {
+        algorithm = algorithm.substr(4);
+    }
+    return new Sign(algorithm, options);
 }

@@ -79,5 +79,7 @@ duk_function_list_entry g_low_native_methods[] = {
   {"createCryptoHash", low_crypto_create_hash, 3},
   {"cryptoHashUpdate", low_crypto_hash_update, 2},
   {"cryptoHashDigest", low_crypto_hash_digest, 1},
+  {"createCryptoKeyObject", low_crypto_create_keyobject, 3},
+  {"cryptoSign", low_crypto_sign, 3},
   {"randomBytes", low_crypto_random_bytes, 2},
   {NULL, NULL, 0}};

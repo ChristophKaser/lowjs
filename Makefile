@@ -33,6 +33,7 @@ OBJECTS =							\
 	src/low_dns.o					\
 	src/low_crypto.o				\
 	src/LowCryptoHash.o				\
+	src/LowCryptoKeyObject.o		\	
 	src/low_data_thread.o			\
 	src/low_web_thread.o			\
 	src/low_alloc.o					\

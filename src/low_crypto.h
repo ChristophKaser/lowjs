@@ -13,6 +13,11 @@ duk_ret_t low_crypto_hash_finalizer(duk_context *ctx);
 duk_ret_t low_crypto_hash_update(duk_context *ctx);
 duk_ret_t low_crypto_hash_digest(duk_context *ctx);
 
+duk_ret_t low_crypto_create_keyobject(duk_context *ctx);
+duk_ret_t low_crypto_keyobject_finalizer(duk_context *ctx);
+
+duk_ret_t low_crypto_sign(duk_context *ctx);
+
 duk_ret_t low_crypto_random_bytes(duk_context *ctx);
 
 #endif /* __LOW_CRYPTO_H__ */

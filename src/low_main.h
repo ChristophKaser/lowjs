@@ -27,6 +27,7 @@ class LowFD;
 class LowDNSResolver;
 class LowTLSContext;
 class LowCryptoHash;
+class LowCryptoKeyObject;
 
 struct low_t
 {
@@ -84,6 +85,7 @@ struct low_t
 #endif /* LOW_INCLUDE_CARES_RESOLVER */
     vector<LowTLSContext *> tlsContexts;
     vector<LowCryptoHash *> cryptoHashes;
+    vector<LowCryptoKeyObject *> cryptoKeyObjects;
 
     pthread_mutex_t ref_mutex;
 
