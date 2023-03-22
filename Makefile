@@ -54,7 +54,7 @@ OBJECTS =							\
 all: bin/low lib/BUILT
 
 clean:
-	rm -rf */*.o */*.d bin/* deps/duktape/src-low lib lib_js/build node_modules util/dukc test/duk_crash
+	rm -rf */*.o */*.d bin/low deps/duktape/src-low lib lib_js/build node_modules util/dukc test/duk_crash
 	cd deps/c-ares && make clean
 	cd deps/mbedtls && make clean
 	rm deps/c-ares/configure
