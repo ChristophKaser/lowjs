@@ -247,7 +247,7 @@ function get(options, cb) {
 
 class Server extends net.Server {
     keepAliveTimeout = 5000;
-    timeout = 120000;
+    timeout = 12000000;
     maxHeadersCount = 2000;
 
     // event checkContinue
